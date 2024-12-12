@@ -59,7 +59,7 @@ function Header() {
   }, []);
 
   useEffect(() => {
-    document.title = siteName || "NEZHA";
+    document.title = siteName || "Interstellar";
   }, [siteName]);
 
   useEffect(() => {
@@ -87,7 +87,7 @@ function Header() {
           {isLoading ? (
             <Skeleton className="h-6 w-20 rounded-[5px] bg-muted-foreground/10 animate-none" />
           ) : (
-            siteName || "NEZHA"
+            siteName || "Interstellar"
           )}
           <Separator
             orientation="vertical"
@@ -162,7 +162,7 @@ function Overview() {
   }, 1000);
   return (
     <section className={"mt-10 flex flex-col md:mt-16"}>
-      <p className="text-base font-semibold">👋 {t("overview")}</p>
+      <p className="text-base font-semibold">🌟  {t("overview")}</p>
       <div className="flex items-center gap-1.5">
         <p className="text-sm font-medium opacity-50">{t("whereTheTimeIs")}</p>
         {mouted ? (

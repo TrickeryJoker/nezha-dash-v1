@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
           <div className="flex items-center gap-1">
             &copy;2020-{new Date().getFullYear()}{" "}
             <a href={"https://github.com/naiba/nezha"} target="_blank">
-              Nezha
+              nezha
             </a>
             <p>{settingData?.data?.version || ""}</p>
           </div>

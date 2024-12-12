@@ -12,7 +12,6 @@ import { WebSocketProvider } from "./context/websocket-provider";
 import { StatusProvider } from "./context/status-provider";
 import { FilterProvider } from "./context/network-filter-context";
 import { TooltipProvider } from "./context/tooltip-provider";
-
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
