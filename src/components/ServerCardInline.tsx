@@ -102,9 +102,9 @@ export default function ServerCardInline({
             <div className={"items-center flex flex-row gap-2 whitespace-nowrap"}>
               <div className="text-xs font-semibold">
                 {platform.includes("Windows") ? (
-                  <MageMicrosoftWindows className="size-[10px]" />
+                    <MageMicrosoftWindows className="size-[10px]"/>
                 ) : (
-                  <p className={`fl-${GetFontLogoClass(platform)}`} />
+                    <p className={`fl-${GetFontLogoClass(platform)}`}/>
                 )}
               </div>
               <div className={"flex w-14 flex-col"}>
@@ -123,30 +123,42 @@ export default function ServerCardInline({
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{"CPU"}</p>
               <div className="flex items-center text-xs font-semibold">{cpu.toFixed(2)}%</div>
-              <ServerUsageBar value={cpu} />
+              <ServerUsageBar value={cpu}/>
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.mem")}</p>
               <div className="flex items-center text-xs font-semibold">{mem.toFixed(2)}%</div>
-              <ServerUsageBar value={mem} />
+              <ServerUsageBar value={mem}/>
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.stg")}</p>
               <div className="flex items-center text-xs font-semibold">{stg.toFixed(2)}%</div>
-              <ServerUsageBar value={stg} />
+              <ServerUsageBar value={stg}/>
             </div>
             <div className={"flex w-16 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.upload")}</p>
               <div className="flex items-center text-xs font-semibold">
-                {up >= 1024 ? `${(up / 1024).toFixed(2)}G/s` : `${up.toFixed(2)}M/s`}
+                {up < 1 ? (up * 1024 < 1 ? `${(up * 1024 * 1024).toFixed(2)}B/s` : `${(up * 1024).toFixed(2)}K/s`) : up >= 1024 ? `${(up / 1024).toFixed(2)}G/s` : `${up.toFixed(2)}M/s`}
               </div>
             </div>
             <div className={"flex w-16 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.download")}</p>
               <div className="flex items-center text-xs font-semibold">
-                {down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}
+                {down < 1 ? (down * 1024 < 1 ? `${(down * 1024 * 1024).toFixed(2)}B/s` : `${(down * 1024).toFixed(2)}K/s`) : down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}
               </div>
             </div>
+            {/*<div className={"flex w-16 flex-col"}>*/}
+            {/*  <p className="text-xs text-muted-foreground">{t("serverCard.upload")}</p>*/}
+            {/*  <div className="flex items-center text-xs font-semibold">*/}
+            {/*    {up >= 1024 ? `${(up / 1024).toFixed(2)}G/s` : `${up.toFixed(2)}M/s`}*/}
+            {/*  </div>*/}
+            {/*</div>*/}
+            {/*<div className={"flex w-16 flex-col"}>*/}
+            {/*  <p className="text-xs text-muted-foreground">{t("serverCard.download")}</p>*/}
+            {/*  <div className="flex items-center text-xs font-semibold">*/}
+            {/*    {down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}*/}
+            {/*  </div>*/}
+            {/*</div>*/}
             <div className={"flex w-20 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.totalUpload")}</p>
               <div className="flex items-center text-xs font-semibold">
@@ -164,23 +176,23 @@ export default function ServerCardInline({
       </Card>
     </section>
   ) : (
-    <Card
-      className={cn(
-        "flex  min-h-[61px] min-w-[900px] items-center justify-start gap-3 p-3 md:px-5 flex-row cursor-pointer hover:bg-accent/50 transition-colors",
-      )}
-      onClick={() => navigate(`/server/${serverInfo.id}`)}
-    >
-      <section
-        className={cn("grid items-center gap-2 lg:w-40")}
-        style={{ gridTemplateColumns: "auto auto 1fr" }}
+      <Card
+          className={cn(
+              "flex  min-h-[61px] min-w-[900px] items-center justify-start gap-3 p-3 md:px-5 flex-row cursor-pointer hover:bg-accent/50 transition-colors",
+          )}
+          onClick={() => navigate(`/server/${serverInfo.id}`)}
       >
-        <span className="h-2 w-2 shrink-0 rounded-full bg-red-500 self-center"></span>
-        <div
-          className={cn("flex items-center justify-center", showFlag ? "min-w-[17px]" : "min-w-0")}
+        <section
+            className={cn("grid items-center gap-2 lg:w-40")}
+            style={{gridTemplateColumns: "auto auto 1fr"}}
         >
-          {showFlag ? <ServerFlag country_code={country_code} /> : null}
-        </div>
-        <div className="relative">
+          <span className="h-2 w-2 shrink-0 rounded-full bg-red-500 self-center"></span>
+          <div
+              className={cn("flex items-center justify-center", showFlag ? "min-w-[17px]" : "min-w-0")}
+          >
+            {showFlag ? <ServerFlag country_code={country_code}/> : null}
+          </div>
+          <div className="relative">
           <p
             className={cn(
               "break-all font-bold w-28 tracking-tight",
