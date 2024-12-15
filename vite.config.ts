@@ -28,12 +28,12 @@ export default defineConfig({
   server: {
     proxy: {
       "/api/v1/ws/server": {
-        target: "ws://localhost:8008",
+        target: "ws://192.168.12.4:10808",
         changeOrigin: true,
         ws: true,
       },
       "/api/v1/": {
-        target: "http://localhost:8008",
+        target: "http://192.168.12.4:10808",
         changeOrigin: true,
       },
     },
