@@ -7,13 +7,22 @@ import { ServiceTracker } from "@/components/ServiceTracker"
 import { Loader } from "@/components/loading/Loader"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { SORT_ORDERS, SORT_TYPES } from "@/context/sort-context"
+import { useSort } from "@/hooks/use-sort"
 import { useStatus } from "@/hooks/use-status"
 import { useWebSocketContext } from "@/hooks/use-websocket-context"
 import { fetchServerGroup } from "@/lib/nezha-api"
 import { cn, formatNezhaInfo } from "@/lib/utils"
 import { NezhaWebsocketResponse } from "@/types/nezha-api"
 import { ServerGroup } from "@/types/nezha-api"
-import { ChartBarSquareIcon, CogIcon, MapIcon, ViewColumnsIcon } from "@heroicons/react/20/solid"
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ArrowsUpDownIcon,
+  ChartBarSquareIcon,
+  MapIcon,
+  ViewColumnsIcon,
+} from "@heroicons/react/20/solid"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -21,6 +30,7 @@ import { toast } from "sonner"
 
 export default function Servers() {
   const { t } = useTranslation()
+  const { sortType, sortOrder, setSortOrder, setSortType } = useSort()
   const { data: groupData } = useQuery({
     queryKey: ["server-group"],
     queryFn: () => fetchServerGroup(),
@@ -137,6 +147,45 @@ export default function Servers() {
           [status].includes(formatNezhaInfo(nezhaWsData.now, server).online ? "online" : "offline"),
         )
 
+  filteredServers = filteredServers.sort((a, b) => {
+    const serverAInfo = formatNezhaInfo(nezhaWsData.now, a)
+    const serverBInfo = formatNezhaInfo(nezhaWsData.now, b)
+
+    if (!serverAInfo.online && serverBInfo.online) return 1
+    if (serverAInfo.online && !serverBInfo.online) return -1
+    if (!serverAInfo.online && !serverBInfo.online) return 0
+
+    let comparison = 0
+
+    switch (sortType) {
+      case "cpu":
+        comparison = (a.state?.cpu ?? 0) - (b.state?.cpu ?? 0)
+        break
+      case "mem":
+        comparison = (a.state?.mem_used ?? 0) - (b.state?.mem_used ?? 0)
+        break
+      case "stg":
+        comparison = (a.state?.disk_used ?? 0) - (b.state?.disk_used ?? 0)
+        break
+      case "up":
+        comparison = (a.state?.net_out_speed ?? 0) - (b.state?.net_out_speed ?? 0)
+        break
+      case "down":
+        comparison = (a.state?.net_in_speed ?? 0) - (b.state?.net_in_speed ?? 0)
+        break
+      case "up total":
+        comparison = (a.state?.net_out_transfer ?? 0) - (b.state?.net_out_transfer ?? 0)
+        break
+      case "down total":
+        comparison = (a.state?.net_in_transfer ?? 0) - (b.state?.net_in_transfer ?? 0)
+        break
+      default:
+        comparison = 0
+    }
+
+    return sortOrder === "asc" ? comparison : -comparison
+  })
+
   return (
     <div className="mx-auto w-full max-w-5xl px-0">
       <ServerOverview
@@ -197,55 +246,65 @@ export default function Servers() {
           <PopoverTrigger asChild>
             <button
               className={cn(
-                "rounded-[50px] text-white cursor-pointer [text-shadow:_0_1px_0_rgb(0_0_0_/_20%)] bg-stone-800 p-[10px] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ",
+                "rounded-[50px] flex items-center gap-1 text-white cursor-pointer [text-shadow:_0_1px_0_rgb(0_0_0_/_20%)] bg-stone-800 p-[10px] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ",
                 {
                   "shadow-[inset_0_1px_0_rgba(0,0,0,0.2)] bg-stone-700": settingsOpen,
                 },
               )}
             >
-              <CogIcon className="size-[13px]" />
+              <p className="text-[10px] font-semibold whitespace-nowrap">
+                {sortType === "default" ? "Sort" : sortType.toUpperCase()}
+              </p>
+              {sortOrder === "asc" && sortType !== "default" ? (
+                <ArrowUpIcon className="size-[13px]" />
+              ) : sortOrder === "desc" && sortType !== "default" ? (
+                <ArrowDownIcon className="size-[13px]" />
+              ) : (
+                <ArrowsUpDownIcon className="size-[13px]" />
+              )}
             </button>
           </PopoverTrigger>
-          <PopoverContent className="py-2 px-2 w-fit max-w-56 rounded-[8px]">
+          <PopoverContent className="py-2 px-2 w-fit max-w-60 rounded-[8px]">
             <div className="flex flex-col gap-2">
               <section className="flex flex-col gap-1">
                 <Label className=" text-stone-500  text-xs">Sort by</Label>
                 <section className="flex items-center gap-1 flex-wrap">
-                  <button className="rounded-[5px] text-[11px] w-fit px-1 py-0.5 cursor-pointer [text-shadow:_0_1px_0_rgb(0_0_0_/_20%)] bg-black  dark:bg-stone-600 text-white transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Default
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    CPU
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Mem
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Stg
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Up
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Down
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Up Total
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Down Total
-                  </button>
+                  {SORT_TYPES.map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setSortType(type)}
+                      className={cn(
+                        "rounded-[5px] text-[11px] w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all dark:shadow-none  ",
+                        {
+                          "bg-black text-white dark:bg-white dark:text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]":
+                            sortType === type,
+                        },
+                      )}
+                    >
+                      {type}
+                    </button>
+                  ))}
                 </section>
               </section>
               <section className="flex flex-col gap-1">
                 <Label className=" text-stone-500  text-xs">Sort order</Label>
                 <section className="flex items-center gap-1">
-                  <button className="rounded-[5px] text-[11px] w-fit px-1 py-0.5 cursor-pointer [text-shadow:_0_1px_0_rgb(0_0_0_/_20%)] bg-black  dark:bg-stone-600 text-white transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Asc
-                  </button>
-                  <button className="rounded-[5px] text-xs w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ">
-                    Desc
-                  </button>
+                  {SORT_ORDERS.map((order) => (
+                    <button
+                      disabled={sortType === "default"}
+                      key={order}
+                      onClick={() => setSortOrder(order)}
+                      className={cn(
+                        "rounded-[5px] text-[11px] w-fit px-1 py-0.5 cursor-pointer bg-transparent border transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  dark:shadow-none",
+                        {
+                          "bg-black text-white dark:bg-white dark:text-black":
+                            sortOrder === order && sortType !== "default",
+                        },
+                      )}
+                    >
+                      {order}
+                    </button>
+                  ))}
                 </section>
               </section>
             </div>
