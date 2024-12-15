@@ -27,6 +27,8 @@ export default function ServerCard({ now, serverInfo }: { now: number; serverInf
   } = formatNezhaInfo(now, serverInfo)
 
   const showFlag = true
+  // @ts-expect-error ShowNetTransfer is a global variable
+  const disableShowNetTransfer = window.ShowNetTransfer === "false"
 
   const parsedData = parsePublicNote(public_note)
 
@@ -88,17 +90,17 @@ export default function ServerCard({ now, serverInfo }: { now: number; serverInf
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{"CPU"}</p>
               <div className="flex items-center text-xs font-semibold">{cpu.toFixed(2)}%</div>
-              <ServerUsageBar value={cpu}/>
+              <ServerUsageBar value={cpu} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.mem")}</p>
               <div className="flex items-center text-xs font-semibold">{mem.toFixed(2)}%</div>
-              <ServerUsageBar value={mem}/>
+              <ServerUsageBar value={mem} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.stg")}</p>
               <div className="flex items-center text-xs font-semibold">{stg.toFixed(2)}%</div>
-              <ServerUsageBar value={stg}/>
+              <ServerUsageBar value={stg} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.upload")}</p>
@@ -111,40 +113,31 @@ export default function ServerCard({ now, serverInfo }: { now: number; serverInf
                 {down < 1 ? (down * 1024 < 1 ? `${(down * 1024 * 1024).toFixed(2)}B/s` : `${(down * 1024).toFixed(2)}K/s`) : down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}
               </div>
             </div>
-            {/*<div className={"flex w-14 flex-col"}>*/}
-            {/*  <p className="text-xs text-muted-foreground">{t("serverCard.upload")}</p>*/}
-            {/*  <div className="flex items-center text-xs font-semibold">*/}
-            {/*    {up >= 1024 ? `${(up / 1024).toFixed(2)}G/s` : `${up.toFixed(2)}M/s`}*/}
-            {/*  </div>*/}
-            {/*</div>*/}
-            {/*<div className={"flex w-14 flex-col"}>*/}
-            {/*  <p className="text-xs text-muted-foreground">{t("serverCard.download")}</p>*/}
-            {/*  <div className="flex items-center text-xs font-semibold">*/}
-            {/*    {down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}*/}
-            {/*  </div>*/}
-            {/*</div>*/}
           </section>
-          <section className={"flex items-center justify-between gap-1"}>
-            <Badge
+          {!disableShowNetTransfer && (
+            <section className={"flex items-center justify-between gap-1"}>
+              <Badge
                 variant="secondary"
                 className="items-center flex-1 justify-center rounded-[8px] text-nowrap text-[11px] border-muted-50 shadow-md shadow-neutral-200/30 dark:shadow-none"
-            >
-              {t("serverCard.upload")}:{formatBytes(net_out_transfer)}
-            </Badge>
-            <Badge
+              >
+                {t("serverCard.upload")}:{formatBytes(net_out_transfer)}
+              </Badge>
+              <Badge
                 variant="outline"
                 className="items-center flex-1 justify-center rounded-[8px] text-nowrap text-[11px] shadow-md shadow-neutral-200/30 dark:shadow-none"
-            >
-              {t("serverCard.download")}:{formatBytes(net_in_transfer)}
-            </Badge>
-          </section>
+              >
+                {t("serverCard.download")}:{formatBytes(net_in_transfer)}
+              </Badge>
+            </section>
+          )}
         </div>
       </Card>
     </section>
   ) : (
     <Card
       className={cn(
-        "flex flex-col lg:min-h-[91px] min-h-[123px] items-center justify-start gap-3 p-3 md:px-5 lg:flex-row cursor-pointer hover:bg-accent/50 transition-colors",
+        "flex flex-col items-center justify-start gap-3 p-3 md:px-5 lg:flex-row cursor-pointer hover:bg-accent/50 transition-colors",
+        !disableShowNetTransfer ? "lg:min-h-[91px] min-h-[123px]" : "lg:min-h-[61px] min-h-[93px]",
       )}
       onClick={() => navigate(`/server/${serverInfo.id}`, { replace: true })}
     >

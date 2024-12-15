@@ -102,9 +102,9 @@ export default function ServerCardInline({
             <div className={"items-center flex flex-row gap-2 whitespace-nowrap"}>
               <div className="text-xs font-semibold">
                 {platform.includes("Windows") ? (
-                    <MageMicrosoftWindows className="size-[10px]"/>
+                  <MageMicrosoftWindows className="size-[10px]" />
                 ) : (
-                    <p className={`fl-${GetFontLogoClass(platform)}`}/>
+                  <p className={`fl-${GetFontLogoClass(platform)}`} />
                 )}
               </div>
               <div className={"flex w-14 flex-col"}>
@@ -117,48 +117,38 @@ export default function ServerCardInline({
             <div className={"flex w-20 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.uptime")}</p>
               <div className="flex items-center text-xs font-semibold">
-                {(uptime / 86400).toFixed(0)} {t("serverCard.days")}
+                {uptime / 86400 >= 1
+                  ? `${(uptime / 86400).toFixed(0)} ${t("serverCard.days")}`
+                  : `${(uptime / 3600).toFixed(0)} ${t("serverCard.hours")}`}
               </div>
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{"CPU"}</p>
               <div className="flex items-center text-xs font-semibold">{cpu.toFixed(2)}%</div>
-              <ServerUsageBar value={cpu}/>
+              <ServerUsageBar value={cpu} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.mem")}</p>
               <div className="flex items-center text-xs font-semibold">{mem.toFixed(2)}%</div>
-              <ServerUsageBar value={mem}/>
+              <ServerUsageBar value={mem} />
             </div>
             <div className={"flex w-14 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.stg")}</p>
               <div className="flex items-center text-xs font-semibold">{stg.toFixed(2)}%</div>
-              <ServerUsageBar value={stg}/>
+              <ServerUsageBar value={stg} />
             </div>
             <div className={"flex w-16 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.upload")}</p>
               <div className="flex items-center text-xs font-semibold">
-                {up < 1 ? (up * 1024 < 1 ? `${(up * 1024 * 1024).toFixed(2)}B/s` : `${(up * 1024).toFixed(2)}K/s`) : up >= 1024 ? `${(up / 1024).toFixed(2)}G/s` : `${up.toFixed(2)}M/s`}
+                  {up < 1 ? (up * 1024 < 1 ? `${(up * 1024 * 1024).toFixed(2)}B/s` : `${(up * 1024).toFixed(2)}K/s`) : up >= 1024 ? `${(up / 1024).toFixed(2)}G/s` : `${up.toFixed(2)}M/s`}
               </div>
             </div>
             <div className={"flex w-16 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.download")}</p>
               <div className="flex items-center text-xs font-semibold">
-                {down < 1 ? (down * 1024 < 1 ? `${(down * 1024 * 1024).toFixed(2)}B/s` : `${(down * 1024).toFixed(2)}K/s`) : down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}
+                  {down < 1 ? (down * 1024 < 1 ? `${(down * 1024 * 1024).toFixed(2)}B/s` : `${(down * 1024).toFixed(2)}K/s`) : down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}
               </div>
             </div>
-            {/*<div className={"flex w-16 flex-col"}>*/}
-            {/*  <p className="text-xs text-muted-foreground">{t("serverCard.upload")}</p>*/}
-            {/*  <div className="flex items-center text-xs font-semibold">*/}
-            {/*    {up >= 1024 ? `${(up / 1024).toFixed(2)}G/s` : `${up.toFixed(2)}M/s`}*/}
-            {/*  </div>*/}
-            {/*</div>*/}
-            {/*<div className={"flex w-16 flex-col"}>*/}
-            {/*  <p className="text-xs text-muted-foreground">{t("serverCard.download")}</p>*/}
-            {/*  <div className="flex items-center text-xs font-semibold">*/}
-            {/*    {down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : `${down.toFixed(2)}M/s`}*/}
-            {/*  </div>*/}
-            {/*</div>*/}
             <div className={"flex w-20 flex-col"}>
               <p className="text-xs text-muted-foreground">{t("serverCard.totalUpload")}</p>
               <div className="flex items-center text-xs font-semibold">
