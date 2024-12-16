@@ -151,13 +151,29 @@ export default function Servers() {
     const serverAInfo = formatNezhaInfo(nezhaWsData.now, a)
     const serverBInfo = formatNezhaInfo(nezhaWsData.now, b)
 
-    if (!serverAInfo.online && serverBInfo.online) return 1
-    if (serverAInfo.online && !serverBInfo.online) return -1
-    if (!serverAInfo.online && !serverBInfo.online) return 0
+    if (sortType !== "name" && sortType !== "system") {
+      // 仅在非 "name" 排序时，先按在线状态排序
+      if (!serverAInfo.online && serverBInfo.online) return 1
+      if (serverAInfo.online && !serverBInfo.online) return -1
+      if (!serverAInfo.online && !serverBInfo.online) {
+        // 如果两者都离线，可以继续按照其他条件排序，或者保持原序
+        // 这里选择保持原序
+        return 0
+      }
+    }
 
     let comparison = 0
 
     switch (sortType) {
+      case "name":
+        comparison = a.name.localeCompare(b.name)
+        break
+      case "uptime":
+        comparison = (a.state?.uptime ?? 0) - (b.state?.uptime ?? 0)
+        break
+      case "system":
+        comparison = a.host.platform.localeCompare(b.host.platform)
+        break
       case "cpu":
         comparison = (a.state?.cpu ?? 0) - (b.state?.cpu ?? 0)
         break
@@ -246,13 +262,14 @@ export default function Servers() {
           <PopoverTrigger asChild>
             <button
               className={cn(
-                "rounded-[50px] flex items-center gap-1 text-white cursor-pointer [text-shadow:_0_1px_0_rgb(0_0_0_/_20%)] bg-stone-800 p-[10px] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ",
+                "rounded-[50px] flex items-center gap-1 dark:text-white border dark:border-none text-black cursor-pointer dark:[text-shadow:_0_1px_0_rgb(0_0_0_/_20%)] dark:bg-stone-800 bg-stone-100  p-[10px] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]  ",
                 {
-                  "shadow-[inset_0_1px_0_rgba(0,0,0,0.2)] bg-stone-700": settingsOpen,
+                  "shadow-[inset_0_1px_0_rgba(0,0,0,0.2)] dark:bg-stone-700 bg-stone-200":
+                    settingsOpen,
                 },
               )}
             >
-              <p className="text-[10px] font-semibold whitespace-nowrap">
+              <p className="text-[10px] font-bold whitespace-nowrap">
                 {sortType === "default" ? "Sort" : sortType.toUpperCase()}
               </p>
               {sortOrder === "asc" && sortType !== "default" ? (
