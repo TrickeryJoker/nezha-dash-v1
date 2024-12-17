@@ -93,9 +93,9 @@ export default function ServerCardInline({
                     </p>
                   ) : parsedData.billingDataMod.amount === "0" ? (
                     <p className={cn("text-[10px] text-green-600 ")}>免费</p>
-                  ) : (
+                  ) : parsedData.billingDataMod.amount === "-1" ? (
                     <p className={cn("text-[10px] text-pink-600 ")}>按量收费</p>
-                  )}
+                  ) : null}
                 </>
               ) : (
                 <>
@@ -109,9 +109,9 @@ export default function ServerCardInline({
                     </p>
                   ) : parsedData.billingDataMod.amount === "0" ? (
                     <p className={cn("text-[10px] text-green-600 ")}>免费</p>
-                  ) : (
+                  ) : parsedData.billingDataMod.amount === "-1" ? (
                     <p className={cn("text-[10px] text-pink-600 ")}>按量收费</p>
-                  )}
+                  ) : null}
                 </>
               ))}
             {parsedData?.planDataMod && (
@@ -246,9 +246,9 @@ export default function ServerCardInline({
                   </p>
                 ) : parsedData.billingDataMod.amount === "0" ? (
                   <p className={cn("text-[10px] text-green-600 ")}>免费</p>
-                ) : (
+                ) : parsedData.billingDataMod.amount === "-1" ? (
                   <p className={cn("text-[10px] text-pink-600 ")}>按量收费</p>
-                )}
+                ) : null}
               </>
             ) : (
               <>
@@ -262,9 +262,9 @@ export default function ServerCardInline({
                   </p>
                 ) : parsedData.billingDataMod.amount === "0" ? (
                   <p className={cn("text-[10px] text-green-600 ")}>免费</p>
-                ) : (
+                ) : parsedData.billingDataMod.amount === "-1" ? (
                   <p className={cn("text-[10px] text-pink-600 ")}>按量收费</p>
-                )}
+                ) : null}
               </>
             ))}
           {parsedData?.planDataMod && (
