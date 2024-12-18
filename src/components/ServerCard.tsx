@@ -28,7 +28,7 @@ export default function ServerCard({ now, serverInfo }: { now: number; serverInf
 
   const showFlag = true
   // @ts-expect-error ShowNetTransfer is a global variable
-  const showNetTransfer = window.ShowNetTransfer === "true"
+  const showNetTransfer = window.ShowNetTransfer as boolean
 
   const parsedData = parsePublicNote(public_note)
 
@@ -107,7 +107,7 @@ export default function ServerCard({ now, serverInfo }: { now: number; serverInf
               {parsedData.planDataMod.bandwidth !== "" && (
                 <p
                   className={cn(
-                    "text-[9px] bg-purple-600 dark:bg-purple-800 text-purple-200 dark:text-purple-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+                    "text-[9px] bg-blue-600 dark:bg-blue-800 text-blue-200 dark:text-blue-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
                   )}
                 >
                   {parsedData.planDataMod.bandwidth}
@@ -237,7 +237,7 @@ export default function ServerCard({ now, serverInfo }: { now: number; serverInf
               {parsedData.planDataMod.bandwidth !== "" && (
                 <p
                   className={cn(
-                    "text-[9px] bg-purple-600 dark:bg-purple-800 text-purple-200 dark:text-purple-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
+                    "text-[9px] bg-blue-600 dark:bg-blue-800 text-blue-200 dark:text-blue-300  w-fit rounded-[5px] px-[3px] py-[1.5px]",
                   )}
                 >
                   {parsedData.planDataMod.bandwidth}
