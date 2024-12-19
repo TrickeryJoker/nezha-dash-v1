@@ -41,7 +41,7 @@ function Header() {
   }, [customLogo])
 
   useEffect(() => {
-    document.title = siteName || "不要温和地走入那个良夜"
+    document.title = siteName || "Interstellar"
   }, [siteName])
 
   return (
