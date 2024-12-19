@@ -41,7 +41,7 @@ function Header() {
   }, [customLogo])
 
   useEffect(() => {
-    document.title = siteName || "哪吒监控 Nezha Monitoring"
+    document.title = siteName || "不要温和地走入那个良夜"
   }, [siteName])
 
   return (
@@ -124,7 +124,7 @@ function Overview() {
   }, 1000)
   return (
     <section className={"mt-10 flex flex-col md:mt-16"}>
-      <p className="text-base font-semibold">👋 {t("overview")}</p>
+      <p className="text-base font-semibold">🌟 {t("overview")}</p>
       <div className="flex items-center gap-1.5">
         <p className="text-sm font-medium opacity-50">{t("whereTheTimeIs")}</p>
         {mouted ? (
