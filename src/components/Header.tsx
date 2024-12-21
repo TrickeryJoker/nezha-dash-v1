@@ -1,7 +1,9 @@
 import { ModeToggle } from "@/components/ThemeSwitcher"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useWebSocketContext } from "@/hooks/use-websocket-context"
 import { fetchLoginUser, fetchSetting } from "@/lib/nezha-api"
+import { cn } from "@/lib/utils"
 import { useQuery } from "@tanstack/react-query"
 import { DateTime } from "luxon"
 import { useEffect, useRef, useState } from "react"
@@ -9,6 +11,8 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 
 import { LanguageSwitcher } from "./LanguageSwitcher"
+import { Loader } from "./loading/Loader"
+import { Button } from "./ui/button"
 
 function Header() {
   const { t } = useTranslation()
@@ -20,6 +24,10 @@ function Header() {
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   })
+
+  const { lastMessage, connected } = useWebSocketContext()
+
+  const onlineCount = connected ? (lastMessage ? JSON.parse(lastMessage.data).online || 0 : 0) : "..."
 
   const siteName = settingData?.data?.site_name
 
@@ -62,15 +70,29 @@ function Header() {
           <p className="hidden text-sm font-medium opacity-40 md:block">{customDesc}</p>
         </section>
         <section className="flex items-center gap-2">
-          <div className="hidden sm:block">
+          <div className="hidden sm:flex items-center gap-2">
             <Links />
+            <DashboardLink />
           </div>
-          <DashboardLink />
           <LanguageSwitcher />
           <ModeToggle />
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn("hover:bg-white dark:hover:bg-black cursor-default rounded-full flex items-center px-[9px] bg-white dark:bg-black")}
+          >
+            {connected ? onlineCount : <Loader visible={true} />}
+            <p className="text-muted-foreground">{connected ? t("online") : t("offline")}</p>
+            <span
+              className={cn("h-2 w-2 rounded-full bg-green-500", {
+                "bg-red-500": !connected,
+              })}
+            ></span>
+          </Button>
         </section>
       </section>
-      <div className="w-full flex justify-end sm:hidden mt-1">
+      <div className="w-full flex justify-between sm:hidden mt-1">
+        <DashboardLink />
         <Links />
       </div>
       <Overview />
