@@ -9,13 +9,43 @@ interface WebSocketProviderProps {
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ url, children }) => {
   const [lastMessage, setLastMessage] = useState<{ data: string } | null>(null)
+  const [messageHistory, setMessageHistory] = useState<{ data: string }[]>([]) // 新增历史消息状态
   const [connected, setConnected] = useState(false)
   const ws = useRef<WebSocket | null>(null)
   const reconnectTimeout = useRef<NodeJS.Timeout>(null)
   const maxReconnectAttempts = 30
   const reconnectAttempts = useRef(0)
+  const isConnecting = useRef(false)
+
+  const cleanup = () => {
+    if (ws.current) {
+      // 移除所有事件监听器
+      ws.current.onopen = null
+      ws.current.onclose = null
+      ws.current.onmessage = null
+      ws.current.onerror = null
+
+      if (ws.current.readyState === WebSocket.OPEN || ws.current.readyState === WebSocket.CONNECTING) {
+        ws.current.close()
+      }
+      ws.current = null
+    }
+    if (reconnectTimeout.current) {
+      clearTimeout(reconnectTimeout.current)
+      reconnectTimeout.current = null
+    }
+    setConnected(false)
+  }
 
   const connect = () => {
+    if (isConnecting.current) {
+      console.log("Connection already in progress")
+      return
+    }
+
+    cleanup()
+    isConnecting.current = true
+
     try {
       const wsUrl = new URL(url, window.location.origin)
       wsUrl.protocol = wsUrl.protocol.replace("http", "ws")
@@ -26,13 +56,15 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ url, child
         console.log("WebSocket connected")
         setConnected(true)
         reconnectAttempts.current = 0
+        isConnecting.current = false
       }
 
       ws.current.onclose = () => {
         console.log("WebSocket disconnected")
         setConnected(false)
+        ws.current = null
+        isConnecting.current = false
 
-        // 重连逻辑
         if (reconnectAttempts.current < maxReconnectAttempts) {
           reconnectTimeout.current = setTimeout(() => {
             reconnectAttempts.current++
@@ -42,33 +74,47 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ url, child
       }
 
       ws.current.onmessage = (event) => {
-        setLastMessage({ data: event.data })
+        const newMessage = { data: event.data }
+        setLastMessage(newMessage)
+        // 更新历史消息，保持最新的30条记录
+        setMessageHistory((prev) => {
+          const updated = [newMessage, ...prev]
+          return updated.slice(0, 30)
+        })
       }
 
       ws.current.onerror = (error) => {
         console.error("WebSocket error:", error)
+        isConnecting.current = false
       }
     } catch (error) {
       console.error("WebSocket connection error:", error)
+      isConnecting.current = false
     }
+  }
+
+  const reconnect = () => {
+    reconnectAttempts.current = 0
+    // 等待一个小延时确保清理完成
+    cleanup()
+    setTimeout(() => {
+      connect()
+    }, 100)
   }
 
   useEffect(() => {
     connect()
 
     return () => {
-      if (ws.current) {
-        ws.current.close()
-      }
-      if (reconnectTimeout.current) {
-        clearTimeout(reconnectTimeout.current)
-      }
+      cleanup()
     }
   }, [url])
 
   const contextValue: WebSocketContextType = {
     lastMessage,
     connected,
+    messageHistory, // 添加到 context value
+    reconnect, // 添加到 context value
   }
 
   return <WebSocketContext.Provider value={contextValue}>{children}</WebSocketContext.Provider>

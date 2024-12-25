@@ -140,12 +140,32 @@ function Links() {
 
 function DashboardLink() {
   const { t } = useTranslation()
+  const { reconnect } = useWebSocketContext()
+  const initRef = useRef(false)
   const { data: userData } = useQuery({
     queryKey: ["login-user"],
     queryFn: () => fetchLoginUser(),
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+    refetchIntervalInBackground: true,
+    refetchInterval: 1000 * 60 * 1,
+    retry: false,
   })
+
+  let isLogin = !!userData?.data?.id
+
+  if (!document.cookie) {
+    isLogin = false
+  }
+
+  useEffect(() => {
+    // 当登录状态变化时重新连接 WebSocket
+    if (initRef.current) {
+      reconnect()
+    } else {
+      initRef.current = true
+    }
+  }, [isLogin])
 
   return (
     <div className="flex items-center gap-2">
@@ -155,8 +175,8 @@ function DashboardLink() {
         rel="noopener noreferrer"
         className="flex items-center text-nowrap gap-1 text-sm font-medium opacity-50 transition-opacity hover:opacity-100"
       >
-        {!userData?.data?.id && t("login")}
-        {userData?.data?.id && t("dashboard")}
+        {!isLogin && t("login")}
+        {isLogin && t("dashboard")}
       </a>
     </div>
   )
