@@ -102,7 +102,6 @@ export default function ServerCardInline({ now, serverInfo }: { now: number; ser
               <p className="text-xs text-muted-foreground">{t("serverCard.download")}</p>
               <div className="flex items-center text-xs font-semibold">
                 {down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : down >= 1 ? `${down.toFixed(2)}M/s` : down >= 0.001 ? `${(down * 1024).toFixed(2)}K/s` : `${(down * 1024 * 1024).toFixed(2)}B/s`}              </div>
-                {down >= 1024 ? `${(down / 1024).toFixed(2)}G/s` : down >= 1 ? `${down.toFixed(2)}M/s` : `${(down * 1024).toFixed(2)}K/s`}
               </div>
             </div>
             <div className={"flex w-20 flex-col"}>
